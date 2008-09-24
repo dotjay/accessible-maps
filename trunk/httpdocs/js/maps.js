@@ -67,15 +67,12 @@ function loadMap()
 	if (!GBrowserIsCompatible() || !(document.createElementNS || document.createElement) || !document.createTextNode) return false;
 	if (!(typeof map_markers[0]=='object')) return false;
 
-
 	// Try to get the map container
 	var elMap=getMapElement("map");
-
 
 	// Create the map
 	map=new GMap2(elMap);
 	if(!map) return false;
-
 
 	// Set up the map
 	$('#map')
@@ -83,21 +80,17 @@ function loadMap()
 		.wrap('<div id="map-enabled">')			// Restructure
 		.before('<div id="controls"></div>');	// Controls container
 
-
 	// May help reduce problems for people with tremors, no fine mouse control...
 	map.disableDoubleClickZoom();
-
 
 	// Center map
 	map_default=new GLatLng(defaults["latitude"],defaults["longitude"]);
 	map.setCenter(map_default,defaults["zoom"]);
 	map_center=map.getCenter();
 
-
 	// Add Google Maps controls - do not want!
 	//map.addControl(new GLargeMapControl(),new GControlPosition(G_ANCHOR_TOP_LEFT));
 	//map.addControl(new GMapTypeControl());
-
 
 	// Add custom controls
 	// Built upon work by Derek Featherstone: http://ironfeathers.ca/routes/
@@ -151,7 +144,6 @@ function loadMap()
 		.append(zoomin)
 		.append(zoomout);
 
-
 	var smallmap = $('<input type="image" id="small-map" src="images/small-map.gif" alt="Small map">')
 		.click(function(){
 			$('#map')
@@ -189,7 +181,6 @@ function loadMap()
 		.append(mediummap)
 		.append(largemap);
 
-
 	// Set up map toggle as a keyboard accessible element
 	$('#map-enabled')
 		.before('<div id="map-toggle"><a href="javascript:;"><img src="images/close-map.gif" alt="Close the map" /></a></div>');
@@ -209,12 +200,10 @@ function loadMap()
 			});
 		});
 
-
 	// Generate the controls
 	$('#controls')
 		.append(map_control)
 		.append(map_resize);
-
 
 	// Add markers
 	for(var i=map_markers.length-1; i>=0; i--){
@@ -234,10 +223,9 @@ function loadMap()
 		map.addOverlay(map_markers[i]["marker"]);
 	};
 
-
-	// Now that the map has size, etc. it needs to redraw.
+	// Now that the map has size, etc. redraw and centre.
 	map.checkResize();
-
+	map.setCenter(map_center,defaults["zoom"]);
 
 	return true;
 }
