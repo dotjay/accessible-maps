@@ -1,0 +1,98 @@
+PROJECT:	Accessible Maps (working title)
+URL:		http://code.google.com/p/accessible-maps/
+
+It begun at the Scripting Enabled hack day at GameLabs, 20 September 2008
+http://scriptingenabled.org/
+http://maps.google.co.uk/maps?f=q&hl=en&geocode=&q=+E2+8AA&ie=UTF8&ll=51.528386,-0.078184&spn=0.003658,0.01104&t=h&z=17
+
+Hack day team:
+	Jon Gibbins		http://dotjay.co.uk/
+	Ann McMeekin	http://www.pixeldiva.co.uk/
+	Andy Ronksley	http://www.rnib.org.uk/wacblog/about/	http://twitter.com/andyronksley
+	Marco Ranon		http://www.rnib.org.uk/wacblog/about/
+	Samantha Roach	http://twitter.com/stvroach
+	Antonia Hyde	http://www.abilitynet.org.uk/accessibility2/who.html#hyde
+	Gilles Ruppert	http://twitter.com/elduderino78
+
+FTP details:
+	ftp://ftp.dotjay.co.uk
+	u: access-map@dotjay.co.uk
+	p: ed382cf5
+
+Resources:
+	http://code.google.com/apis/maps/documentation/
+	http://code.google.com/apis/maps/documentation/examples/index.html
+	http://icant.co.uk/easy-youtube/
+	http://ironfeathers.ca/routes/
+	http://ironfeathers.ca/javascript/maps.js
+	http://www.salford.ac.uk/travel/map/
+	http://www.salford.ac.uk/travel/map/accessgmap.js
+	http://easi.cc/archive/gmap/gmap.htm
+
+NB: When working with the Google Maps API locally, work under http://localhost/ and you won't need an API key.
+
+
+2008-09-20:
+NOTES:
+			- More ideas for names:
+				- My Map / My YouTube
+					- "My Maps" is too close to what Google call their custom maps feature :(
+				- My Map, My Way
+					- Is it too close to the BBC's "My Web, My Way"?
+				- Easy Map
+					- We don't particularly like the word 'easy'.
+				- Accessimap
+					- It's not real word(s) - does that make it less accessible?
+			- Get local information:
+				- Multimap has an open API:
+					http://www.multimap.com/openapi/
+					http://blog.multimap.com/category/multimap-open-api/
+				- pushpin API:
+					http://www.pushpin.com/api/docs/rest/
+					http://www.programmableweb.com/api/pushpin-location-data
+			- The guy from the hack day who had oodles of locality data; was he something to do with the uni?
+			- Is zoomed out more a better place to start the map, e.g. so that users can identify a landmark? Nearest town, major road...
+
+
+ACTIONS:
+			GENERAL:
+			[*] move code from dotjay.co.uk/scriptingenabled
+			[*] move code into a Google hosted project
+
+			INTERFACE:
+			[ ] change marker image.
+			[ ] cross on toggle.
+			[ ] change the URL.
+			[ ] change the word 'reset' to something else.
+			[ ] change the name?
+			[ ] different control interfaces
+				- linear left
+				- gamepad
+				- grouped direction controls, up down vert, left right horiz
+				- surrounded controls
+			[ ] indicate how zoomed in am I?
+			[ ] disable the zoom in/out buttons if at the zoom limits.
+
+			STYLES:
+			[ ] make map controls buttons with background images for the icons.
+				- text can resize.
+				- is accessible to partially sighted users.
+
+			FUNCTIONALITY:
+			[ ] tidy the associative arrays - use objects in JS, dumb ass
+			[ ] add directions lookup.
+				- function is in js/directions.js
+				- use ?output=html on the end of the URL in Google Maps
+				- e.g. http://maps.google.co.uk/maps?f=d&source=s_d&abauth=6cea6a25%3A4DqAoMoOTDjvxNagB5usLbnbuIw&output=html&hl=en&saddr=WC1H9NE&daddr=e2+8AA&btnG=Get+Directions
+			[ ] reload the tiles on resize.
+			[ ] disable the zoom in/out buttons if at the zoom limits.
+			[ ] dynamically generate the map controls (because the map is only there to control if JS is available).
+			[ ] add access keys? ask a screen reader user.
+			[ ] add cursor control to the map (thanks for the idea, Christian).
+				- do this when the map has focus? probably not.
+			[ ] create a bookmarklet to redirect people from Google Maps (thanks for the idea, Christian).
+				- see: http://scriptingenabled.org/2008/09/easy-youtube-greasemonkey-script/
+			[ ] game pad control for people with physical disability
+			[ ] style switcher for different interfaces
+
+
