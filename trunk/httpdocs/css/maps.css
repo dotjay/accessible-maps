@@ -74,13 +74,18 @@ p {
 	-moz-border-radius: 10px;
 }
 
-#togglemap {
+#map-toggle {
 	background-color: #57616C;
 	margin: 5px 5px 0 5px;
 	-moz-border-radius: 10px;
 }
 
-#mapwrap {
+#map-toggle input {
+	display: block;
+	width: 100%;
+}
+
+#map-wrap {
 	position: relative;
 	height: 40em;
 }
@@ -123,4 +128,9 @@ p {
 	/* background-color: maroon;
 	clear: both;*/
 	display: none;
+}
+
+#footer {
+	clear: both;
+	padding: 1em 0;
 }

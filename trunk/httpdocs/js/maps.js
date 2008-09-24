@@ -40,7 +40,7 @@ map_markers[0]["zoom"] = 15;
 
 // Main
 
-var map,map_center,map_default,map_overlay=null;
+var map,map_center,map_default;
 
 function addLoadEvent(func)
 {
@@ -75,6 +75,11 @@ function loadMap()
 	// Create map
 	map=new GMap2(elMap);
 	if(!map) return false;
+
+
+	$('#map')
+		.wrap('<div id="map-wrap">')								// Restructure
+		.before('<div id="controls"></div>');					// Controls placeholder
 
 
 	// May help reduce problems for people with tremors, no fine mouse control...
@@ -135,6 +140,7 @@ function loadMap()
 
 	var map_control = $('<div>')
 		.attr('id','map-control')
+		.append('<h2>Move the map</h2>')
 		.append(up)
 		.append(down)
 		.append(left)
@@ -146,51 +152,65 @@ function loadMap()
 
 	var smallmap = $('<input type="image" id="small-map" src="images/small-map.gif" alt="Small map">')
 		.click(function(){
-			$('#map').addClass('small');
-			$('#map').removeClass('medium');
-			$('#map').removeClass('large');
+			$('#map')
+				.addClass('small')
+				.removeClass('medium')
+				.removeClass('large');
+			map.checkResize();
+			//map.setCenter(map_center);
 		});
 
 	var mediummap = $('<input type="image" id="medium-map" src="images/medium-map.gif" alt="Medium map">')
 		.click(function(){
-			$('#map').removeClass('small');
-			$('#map').addClass('medium');
-			$('#map').removeClass('large');
+			$('#map')
+				.removeClass('small')
+				.addClass('medium')
+				.removeClass('large');
+			map.checkResize();
+			//map.setCenter(map_center);
 		});
 
 	var largemap = $('<input type="image" id="large-map" src="images/large-map.gif" alt="Large map">')
 		.click(function(){
-			$('#map').removeClass('small');
-			$('#map').removeClass('medium');
-			$('#map').addClass('large');
+			$('#map')
+				.removeClass('small')
+				.removeClass('medium')
+				.addClass('large');
+			map.checkResize();
+			//map.setCenter(map_center);
 		});
 
 	var map_resize = $('<div>')
 		.attr('id','map-resize')
+		.append('<h2>Map size</h2>')
 		.append(smallmap)
 		.append(mediummap)
 		.append(largemap);
 
 
-	// Hacking it in (this is a hack day after all!)
-	$('#togglemap')
+	// Set up map toggle as a keyboard accessible element
+	$('#map-wrap')
+		.before('<div id="map-toggle"><input type="image" src="images/close-map.gif" alt="Close the map" /></div>');
+	$('#map-toggle input')
 		.click(function(){
-			$('#mapwrap').toggle(function(){
+			$('#map-wrap').toggle(function(){
 				if ($(this).css('display')=='none') {
-					$('#togglemap h2').text('Open map');
+					$('#map-toggle input')
+						.attr('src','images/open-map.gif')
+						.attr('alt','Open the map');
 				}else{
-					$('#togglemap h2').text('Close map');
+					$('#map-toggle input')
+						.attr('alt','images/close-map.gif')
+						.attr('alt','Close the map');
 				}
-			}
-				
-			);
-			//$('#mapwrap h2').toggle();
+			});
 		});
 
 
-	// Change this to dynamically generate the controls
-	$('#h21').after(map_control);
-	$('#h22').after(map_resize);
+	// Generate the controls
+	$('#controls')
+		.append(map_control)
+		.append(map_resize);
 
 
 	// Add markers
@@ -202,20 +222,15 @@ function loadMap()
 
 		map_markers[i]["html"]=map_html;
 
-		// set position
+		// Set marker position
 		map_markers[i]["latlng"]=new GLatLng(parseFloat(map_markers[i]["latitude"]),parseFloat(map_markers[i]["longitude"]));
 
-		// create and add marker
+		// Create and add marker
 		map_markers[i]["marker"]=new GMarker(map_markers[i]["latlng"]);
 		map_markers[i]["marker"].value=i;
 		map.addOverlay(map_markers[i]["marker"]);
-
-		GEvent.addListener(map,"zoomend",function()
-		{
-			if(map_overlay!=null) map_overlay.redraw(true);
-		});
-
 	};
+
 
 	return true;
 }
