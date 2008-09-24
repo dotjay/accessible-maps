@@ -72,20 +72,28 @@ p {
 	background-color: #099;
 	margin: 5px 5px 0 5px;
 	padding: 0.25em 0.25em 0;
+	border-radius: 10px;
 	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
 }
 
 #search {
 	background-color: #39C;
 	margin: 5px 5px 0 5px;
 	padding: 0.25em;
+	border-radius: 10px;
 	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
 }
 
 #map-toggle {
 	background-color: #57616C;
 	margin: 10px 5px;
+	padding: 10px 0
+
+	border-radius: 10px;
 	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
 }
 
 #map-toggle a {
@@ -103,7 +111,10 @@ p {
 	width: 230px;
 	float: left;
 	margin: 0 5px 5px;
+	padding: 10px 0
+	border-radius: 10px;
 	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
 }
 
 #controls h2 {
@@ -122,6 +133,10 @@ p {
 	position: absolute;
 	left: 240px;
 	padding-top: 0;
+}
+
+#map-resize {
+	margin-bottom: 10px;
 }
 
 #map.small {
