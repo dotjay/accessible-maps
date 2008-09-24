@@ -68,18 +68,20 @@ function loadMap()
 	if (!(typeof map_markers[0]=='object')) return false;
 
 
-	// Try to get map element
+	// Try to get the map container
 	var elMap=getMapElement("map");
 
 
-	// Create map
+	// Create the map
 	map=new GMap2(elMap);
 	if(!map) return false;
 
 
+	// Set up the map
 	$('#map')
-		.wrap('<div id="map-wrap">')								// Restructure
-		.before('<div id="controls"></div>');					// Controls placeholder
+		.addClass('medium')						// Default map size
+		.wrap('<div id="map-enabled">')			// Restructure
+		.before('<div id="controls"></div>');	// Controls container
 
 
 	// May help reduce problems for people with tremors, no fine mouse control...
@@ -189,19 +191,20 @@ function loadMap()
 
 
 	// Set up map toggle as a keyboard accessible element
-	$('#map-wrap')
-		.before('<div id="map-toggle"><input type="image" src="images/close-map.gif" alt="Close the map" /></div>');
-	$('#map-toggle input')
+	$('#map-enabled')
+		.before('<div id="map-toggle"><a href="javascript:;"><img src="images/close-map.gif" alt="Close the map" /></a></div>');
+	$('#map-toggle a')
 		.click(function(){
-			$('#map-wrap').toggle(function(){
+			$('#map-enabled').slideToggle('slow',function(){
 				if ($(this).css('display')=='none') {
-					$('#map-toggle input')
-						.attr('src','images/open-map.gif')
+					$('#map-toggle img')
+						.attr('src','images/close-map.gif')	// NB: change to open-map.gif
 						.attr('alt','Open the map');
 				}else{
-					$('#map-toggle input')
-						.attr('alt','images/close-map.gif')
+					$('#map-toggle img')
+						.attr('src','images/close-map.gif')
 						.attr('alt','Close the map');
+					map.checkResize();
 				}
 			});
 		});
@@ -230,6 +233,10 @@ function loadMap()
 		map_markers[i]["marker"].value=i;
 		map.addOverlay(map_markers[i]["marker"]);
 	};
+
+
+	// Now that the map has size, etc. it needs to redraw.
+	map.checkResize();
 
 
 	return true;
