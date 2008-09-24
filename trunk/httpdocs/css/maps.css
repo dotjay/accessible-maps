@@ -123,6 +123,10 @@ p {
 	font-weight: normal;
 }
 
+#map-toggle img {
+	padding: 5px 0 0 1px;
+}
+
 #map {
 	margin: 5px 5px 0 5px;
 	padding-top: 0.25em;
