@@ -60,11 +60,14 @@ ACTIONS:
 			[*] move code into a Google hosted project
 
 			INTERFACE:
+			[ ] create close map button
+			[ ] create faded versions of icons that can be disabled - e.g., zoom in and out, and small medium and large
+			[ ] do something nicer with typography and colour
 			[ ] change marker image.
-			[ ] cross on toggle.
+			[*] cross on toggle.
 			[ ] change the URL.
 			[ ] change the word 'reset' to something else.
-			[ ] change the name?
+			[*] change the name?
 			[ ] different control interfaces
 				- linear left
 				- gamepad
