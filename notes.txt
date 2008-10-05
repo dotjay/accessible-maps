@@ -6,18 +6,13 @@ http://scriptingenabled.org/
 http://maps.google.co.uk/maps?f=q&hl=en&geocode=&q=+E2+8AA&ie=UTF8&ll=51.528386,-0.078184&spn=0.003658,0.01104&t=h&z=17
 
 Hack day team:
-	Jon Gibbins		http://dotjay.co.uk/
+	Jon Gibbins	http://dotjay.co.uk/
 	Ann McMeekin	http://www.pixeldiva.co.uk/
 	Andy Ronksley	http://www.rnib.org.uk/wacblog/about/	http://twitter.com/andyronksley
-	Marco Ranon		http://www.rnib.org.uk/wacblog/about/
+	Marco Ranon	http://www.rnib.org.uk/wacblog/about/
 	Samantha Roach	http://twitter.com/stvroach
 	Antonia Hyde	http://www.abilitynet.org.uk/accessibility2/who.html#hyde
 	Gilles Ruppert	http://twitter.com/elduderino78
-
-FTP details:
-	ftp://ftp.dotjay.co.uk
-	u: access-map@dotjay.co.uk
-	p: ed382cf5
 
 Resources:
 	http://code.google.com/apis/maps/documentation/
