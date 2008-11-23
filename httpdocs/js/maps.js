@@ -1,10 +1,12 @@
 /*
 
 Accessible Maps
+http://scriptingenabed.pbwiki.com/Easy-Google-Maps
 
 Scripting Enabled, September 2008
 http://scriptingenabled.org/
 
+Contributors:
 Jon Gibbins
 Ann McMeekin
 Andy Ronksley
@@ -16,241 +18,240 @@ Gilles Ruppert
 */
 
 
-// Settings
-
-var defaults = Array();
-defaults["latitude"] = "51.528386";
-defaults["longitude"] = "-0.078184";
-defaults["zoom"] = 15;
-defaults["panAmount"] = 1;
-defaults["directions_label"] = 'Get directions from';
-
-
-// Markers
-var map_markers = Array();
-
-// Default marker
-map_markers[0] = Array();
-map_markers[0]["label"] = "GameLab";
-map_markers[0]["latitude"] = "51.528386";
-map_markers[0]["longitude"] = "-0.078184";
-map_markers[0]["daddr"] = 'E2+8AA';
-map_markers[0]["zoom"] = 15;
-
-
-// Main
-
-var map,map_center,map_default;
-
-function addLoadEvent(func)
-{
-	var oldonload=window.onload;
-	if (typeof window.onload!='function') window.onload=func;
-	else{
-		window.onload=function(){
+function addLoadEvent(func) {
+	var oldonload = window.onload;
+	if (typeof window.onload != 'function') {
+		window.onload = func;
+	} else{
+		window.onload = function() {
 			oldonload();
 			func();
 		}
 	}
 }
 
+function createElement(element) {
+	element = element.toLowerCase();
+	if (typeof document.createElementNS != 'undefined') {
+		return document.createElementNS('http://www.w3.org/1999/xhtml', element);
+	}
+	if (typeof document.createElement != 'undefined') {
+		return document.createElement(element);
+	}
+	return false;
+}
+
+function insertAfter(newElement, targetElement) {
+	var parent = targetElement.parentNode;
+	if (parent.lastChild == targetElement) {
+		parent.appendChild(newElement);
+	} else {
+		parent.insertBefore(newElement, targetElement.nextSibling);
+	}
+}
+
+function wrap(element, withElement) {
+	insertAfter(withElement, element);
+	withElement.appendChild(element);
+}
+
+
 
 // Google Maps
 
-function initMap()
+var map;
+
+function getMapElement(id)
 {
-	setTimeout("if(typeof GMap2!='undefined') loadMap();",10);
+	var elMap = document.getElementById(id);
+	if (!elMap) {
+		return false;
+	}
+	while (elMap.hasChildNodes()) elMap.removeChild(elMap.firstChild);
+	return elMap;
 }
 
-function loadMap()
-{
-	if (!GBrowserIsCompatible() || !(document.createElementNS || document.createElement) || !document.createTextNode) return false;
-	if (!(typeof map_markers[0]=='object')) return false;
+function getDirections(map, containerId, fromAddress, toAddress) {
+	var directions = new GDirections(map, document.getElementById(containerId));
+	directions.load("from: " + fromAddress + " to: " + toAddress, { "locale": en_UK });
+}
+
+// This generates our custom map controls. We could use a button element for this, but will be using an image input element.
+function mapControl(label, action) {
+	if (typeof label != 'string') {
+		return false;
+	}
+
+	var id = label.toLowerCase();
+	id = id.replace(' ', '-');
+
+	var control = createElement('input');
+	control.setAttribute('type', 'image');
+	control.setAttribute('src', 'images/' + id + '.gif');
+	control.setAttribute('alt', label);
+	control.setAttribute('id', id);
+	control.appendChild(document.createTextNode(label));
+
+	GEvent.addDomListener(control, "click", action);
+
+	return control;
+}
+
+function initMap() {
+	setTimeout("if (typeof GMap2 != 'undefined') loadMap();", 10);
+}
+
+function loadMap() {
+	if (
+		!GBrowserIsCompatible()
+		|| !(document.createElementNS || document.createElement)
+		|| !document.createTextNode
+		|| !(typeof mapMarkers == 'object')
+		) return false;
 
 	// Try to get the map container
-	var elMap=getMapElement("map");
+	var elMap = getMapElement("map");
 
 	// Create the map
-	map=new GMap2(elMap);
-	if(!map) return false;
+	map = new GMap2(elMap);
+	if (!map) return false;
 
-	// Set up the map
-	$('#map')
-		.addClass('medium')						// Default map size
-		.wrap('<div id="map-enabled">')			// Restructure
-		.before('<div id="controls"></div>');	// Controls container
-
-	// May help reduce problems for people with tremors, no fine mouse control...
+	// Disable the double click zoom feature. This may help reduce problems for people with tremors, no fine mouse control...
 	map.disableDoubleClickZoom();
 
-	// Center map
-	map_default=new GLatLng(defaults["latitude"],defaults["longitude"]);
-	map.setCenter(map_default,defaults["zoom"]);
-	map_center=map.getCenter();
+	// Center the map on default location
+	map.setCenter(new GLatLng(mapDefaults.latitude, mapDefaults.longitude), mapDefaults.zoom);
+	map.center = map.getCenter();
 
-	// Add Google Maps controls - do not want!
-	//map.addControl(new GLargeMapControl(),new GControlPosition(G_ANCHOR_TOP_LEFT));
+	// If we were doing a typical Google Map implementation, we'd add the controls here.
+	// We won't be doing that here, but for a good article on making Google's map controls accessible, see:
+	// http://dev.opera.com/articles/view/keyboard-accessible-google-maps/
+	//map.addControl(new GLargeMapControl(), new GControlPosition(G_ANCHOR_TOP_LEFT));
 	//map.addControl(new GMapTypeControl());
 
-	// Add custom controls
+	// Set up the map with the default map size
+	elMap.className = mapDefaults.size;
+
+	// Restructure (makes it easier to toggle the map)
+	var wrapper = createElement('div');
+	wrapper.setAttribute('id', 'map-enabled');
+	wrap(elMap, wrapper);
+
+	// Create the controls container
+	var controls = createElement('div');
+	controls.setAttribute('id', 'controls');
+
+	// Generate some custom controls.
 	// Built upon work by Derek Featherstone: http://ironfeathers.ca/routes/
+	// We could subclass GControl and use map.addControl() for this, but that adds the control inside the map. We want to be different. :)
 
-	var up = $('<input type="image" id="up" src="images/up.gif" alt="Up">')
-		.click(function(){
-			map.panDirection(0,defaults["panAmount"]);
-		});
+	// Generate custom controls for moving the map.
+	var movementControls = createElement('div');
+	movementControls.setAttribute('id', 'movement-controls');
+	var movementControlsHeading = createElement('h2');
+	movementControlsHeading.appendChild(document.createTextNode('Move the map'));
+	movementControls.appendChild(movementControlsHeading);
 
-	var down = $('<input type="image" id="down" src="images/down.gif" alt="Down">')
-		.click(function(){
-			map.panDirection(0,- defaults["panAmount"]);
-		});
+	movementControls.appendChild(mapControl('Up', function() {
+		map.panDirection(0, mapDefaults.panning);
+	}));
 
-	var left = $('<input type="image" id="left" src="images/left.gif" alt="Left">')
-		.click(function(){
-			map.panDirection(defaults["panAmount"],0);
-		});
+	movementControls.appendChild(mapControl('Down', function() {
+		map.panDirection(0, - mapDefaults.panning);
+	}));
 
-	var right = $('<input type="image" id="right" src="images/right.gif" alt="Right">')
-		.click(function(){
-			map.panDirection(- defaults["panAmount"],0);
-		});
+	movementControls.appendChild(mapControl('Left', function() {
+		map.panDirection(mapDefaults.panning, 0);
+	}));
 
-	var centre = $('<input type="image" id="reset" src="images/reset.gif" alt="Reset">')
-		.click(function(){
-			//var bounds = map.getBounds();
-			//map.panTo(bounds.getCenter());
-			//map.setCenter(map_center);
-			map.setCenter(map_center,defaults["zoom"]);
-		});
+	movementControls.appendChild(mapControl('Right', function() {
+		map.panDirection(- mapDefaults.panning, 0);
+	}));
 
-	var zoomin = $('<input type="image" id="zoom-in" src="images/zoom-in.gif" alt="Zoom in">')
-		.click(function(){
-			map.zoomIn();
-		});
+	movementControls.appendChild(mapControl('Reset', function() {
+		// This is immediate:
+		//map.setCenter(map.center, mapDefaults.zoom);
 
-	var zoomout = $('<input type="image" id="zoom-out" src="images/zoom-out.gif" alt="Zoom out">')
-		.click(function(){
-			map.zoomOut();
-		});
+		// This gives a smoother pan and doesn't reset the zoom level:
+		//map.panTo(map.center);
 
-	var map_control = $('<div>')
-		.attr('id','map-control')
-		.append('<h2>Move the map</h2>')
-		.append(up)
-		.append(down)
-		.append(left)
-		.append(right)
-		.append(centre)
-		.append(zoomin)
-		.append(zoomout);
-
-	var smallmap = $('<input type="image" id="small-map" src="images/small-map.gif" alt="Small map">')
-		.click(function(){
-			$('#map')
-				.addClass('small')
-				.removeClass('medium')
-				.removeClass('large');
-			map.checkResize();
-			//map.setCenter(map_center);
-		});
-
-	var mediummap = $('<input type="image" id="medium-map" src="images/medium-map.gif" alt="Medium map">')
-		.click(function(){
-			$('#map')
-				.removeClass('small')
-				.addClass('medium')
-				.removeClass('large');
-			map.checkResize();
-			//map.setCenter(map_center);
-		});
-
-	var largemap = $('<input type="image" id="large-map" src="images/large-map.gif" alt="Large map">')
-		.click(function(){
-			$('#map')
-				.removeClass('small')
-				.removeClass('medium')
-				.addClass('large');
-			map.checkResize();
-			//map.setCenter(map_center);
-		});
-
-	var map_resize = $('<div>')
-		.attr('id','map-resize')
-		.append('<h2>Map size</h2>')
-		.append(smallmap)
-		.append(mediummap)
-		.append(largemap);
-
-	// Set up map toggle as a keyboard accessible element
-	$('#map-enabled')
-		.before('<div id="map-toggle"><a href="javascript:;"><img src="images/close-map.gif" alt="Close the map" /></a></div>');
-	$('#map-toggle a')
-		.click(function(){
-			$('#map-enabled').slideToggle('slow',function(){
-				if ($(this).css('display')=='none') {
-					$('#map-toggle img')
-						.attr('src','images/close-map.gif')	// NB: change to open-map.gif
-						.attr('alt','Open the map');
-				}else{
-					$('#map-toggle img')
-						.attr('src','images/close-map.gif')
-						.attr('alt','Close the map');
-					map.checkResize();
-				}
+		// This gives a smoother pan and resets the zoom level after the pan is complete:
+		if (map.center == map.getCenter()) {
+			map.setZoom(mapDefaults.zoom);
+		} else {
+			map.panTo(map.center);
+			var mapMoveEvent = GEvent.addListener(map, "moveend", function() {
+				// Must remove listener before setting the zoom, as zoom is considered as a movement and will retrigger this event and cause a loop.
+				GEvent.removeListener(mapMoveEvent);
+				map.setZoom(mapDefaults.zoom);
 			});
-		});
+		}
+	}));
 
-	// Generate the controls
-	$('#controls')
-		.append(map_control)
-		.append(map_resize);
+	movementControls.appendChild(mapControl('Zoom in', function() {
+		map.zoomIn();
+	}));
 
-	// Add markers
-	for(var i=map_markers.length-1; i>=0; i--){
+	movementControls.appendChild(mapControl('Zoom out', function() {
+		map.zoomOut();
+	}));
+
+	// Generate custom controls for changing the size of the map.
+	var resizeControls = createElement('div');
+	resizeControls.setAttribute('id', 'resize-controls');
+	var resizeControlsHeading = createElement('h2');
+	resizeControlsHeading.appendChild(document.createTextNode('Map size'));
+	resizeControls.appendChild(resizeControlsHeading);
+
+	resizeControls.appendChild(mapControl('Small map', function() {
+		elMap.className = 'small';
+		map.checkResize();
+	}));
+
+	resizeControls.appendChild(mapControl('Medium map', function() {
+		elMap.className = 'medium';
+		map.checkResize();
+	}));
+
+	resizeControls.appendChild(mapControl('Large map', function() {
+		elMap.className = 'large';
+		map.checkResize();
+	}));
+
+	// Add the custom controls.
+	controls.appendChild(movementControls);
+	controls.appendChild(resizeControls);
+	elMap.parentNode.insertBefore(controls, elMap);
+
+	// Add the default markers.
+	//var mapHtml;
+	for (marker in mapMarkers) {
 		// Set HTML
-		var map_html='<div id="map-overlay"><form method="get" action="http://maps.google.com/maps">';
-		//map_html += '<p><label for="saddr">'+defaults["directions_label"]+': </label><input class="text" type="text" id="saddr" name="saddr" value="" /><input type="hidden" name="daddr" value="' + map_markers[i]["daddr"] + '" /><input type="hidden" name="hl" value="en" /><input class="submit" type="submit" value="Go" /></p>';
-		map_html += '</form></div>';
-
-		map_markers[i]["html"]=map_html;
+		//mapHtml = '<div id="map-overlay"><form method="get" action="http://maps.google.com/maps">';
+		//mapHtml += '<p><label for="saddr">Get directions from: </label><input class="text" type="text" id="saddr" name="saddr" value="" /><input type="hidden" name="daddr" value="' + mapMarkers[marker].daddr + '" /><input type="hidden" name="hl" value="en" /><input class="submit" type="submit" value="Go" /></p>';
+		//mapHtml += '</form></div>';
+		//mapMarkers[marker].html = mapHtml;
 
 		// Set marker position
-		map_markers[i]["latlng"]=new GLatLng(parseFloat(map_markers[i]["latitude"]),parseFloat(map_markers[i]["longitude"]));
+		mapMarkers[marker].latlng = new GLatLng(parseFloat(mapMarkers[marker].latitude), parseFloat(mapMarkers[marker].longitude));
 
 		// Create and add marker
-		map_markers[i]["marker"]=new GMarker(map_markers[i]["latlng"]);
-		map_markers[i]["marker"].value=i;
-		map.addOverlay(map_markers[i]["marker"]);
+		mapMarkers[marker].marker = new GMarker(mapMarkers[marker].latlng);
+		// Here we flagged the marker ID for some reason. Need to remember why and refactor.
+		//mapMarkers[marker].marker.value = i;
+		map.addOverlay(mapMarkers[marker].marker);
 	};
 
 	// Now that the map has size, etc. redraw and centre.
 	map.checkResize();
-	map.setCenter(map_center,defaults["zoom"]);
+	map.setCenter(map.center, mapDefaults.zoom);
 
 	return true;
 }
 
-function getMapElement(id)
-{
-	var elMap=document.getElementById(id);
-	if(!elMap) return false;
-	while(elMap.hasChildNodes()) elMap.removeChild(elMap.firstChild);
-	return elMap;
-}
 
+// Add load and unload events.
 addLoadEvent(initMap);
-
-window.onunload=function()
-{
-	if(typeof GUnload!='undefined') GUnload();
+window.onunload = function() {
+	if (typeof GUnload != 'undefined') GUnload();
 }
-
-
-// Directions
-
-function getDirections (map, containerId, fromAddress, toAddress) {
-	gdir = new GDirections(map, document.getElementById(containerId));
-	gdir.load("from: " + fromAddress + " to: " + toAddress, { "locale": en_UK });	
-}
-
-

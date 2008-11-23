@@ -24,10 +24,12 @@ Resources:
 	http://www.salford.ac.uk/travel/map/accessgmap.js
 	http://easi.cc/archive/gmap/gmap.htm
 
-NB: When working with the Google Maps API locally, work under http://localhost/ and you won't need an API key.
+Mentions:
+	http://blog.click2map.com/2008/09/27/hackalicious-google-maps/
 
 
-2008-09-20:
+-- 20 Sep 2008 --
+
 NOTES:
 			- More ideas for names:
 				- My Map / My YouTube
@@ -47,15 +49,16 @@ NOTES:
 					http://www.programmableweb.com/api/pushpin-location-data
 			- The guy from the hack day who had oodles of locality data; was he something to do with the uni?
 			- Is zoomed out more a better place to start the map, e.g. so that users can identify a landmark? Nearest town, major road...
+			- NB: When working with the Google Maps API locally, work under http://localhost/ and you won't need an API key.
 
 
 ACTIONS:
 			GENERAL:
-			[*] move code from dotjay.co.uk/scriptingenabled
-			[*] move code into a Google hosted project
+			[*] move code from: dotjay.co.uk/scriptingenabled
+			[*] move code into a Google hosted project.
 
 			INTERFACE:
-			[ ] create close map button
+			[X] create close map button. [JG: I've shifted this off to an options page to tidy the interface.]
 			[ ] create faded versions of icons that can be disabled - e.g., zoom in and out, and small medium and large
 			[ ] do something nicer with typography and colour
 			[ ] change marker image.
@@ -63,7 +66,7 @@ ACTIONS:
 			[ ] change the URL.
 			[ ] change the word 'reset' to something else.
 			[*] change the name?
-			[ ] different control interfaces
+			[ ] implement options for different control interfaces
 				- linear left
 				- gamepad
 				- grouped direction controls, up down vert, left right horiz
@@ -77,14 +80,13 @@ ACTIONS:
 				- is accessible to partially sighted users.
 
 			FUNCTIONALITY:
-			[ ] tidy the associative arrays - use objects in JS, dumb ass
+			[*] tidy the associative arrays - use objects in JS, dumb ass.
 			[ ] add directions lookup.
-				- function is in js/directions.js
-				- use ?output=html on the end of the URL in Google Maps
+				- can use ?output=html on the end of the URL in Google Maps
 				- e.g. http://maps.google.co.uk/maps?f=d&source=s_d&abauth=6cea6a25%3A4DqAoMoOTDjvxNagB5usLbnbuIw&output=html&hl=en&saddr=WC1H9NE&daddr=e2+8AA&btnG=Get+Directions
 			[ ] reload the tiles on resize.
 			[ ] disable the zoom in/out buttons if at the zoom limits.
-			[ ] dynamically generate the map controls (because the map is only there to control if JS is available).
+			[*] dynamically generate the map controls (because the map is only there to control if JS is available).
 			[ ] add access keys? ask a screen reader user.
 			[ ] add cursor control to the map (thanks for the idea, Christian).
 				- do this when the map has focus? probably not.
@@ -94,3 +96,34 @@ ACTIONS:
 			[ ] style switcher for different interfaces
 
 
+-- 23 Nov 2008 --
+
+NOTES:
+			- Should we be providing expalantory text at all? We're aiming to make the interface speak for itself.
+
+ACTIONS:
+			INTERFACE:
+			[ ] Use the Google Static Maps API to provide a non-JS version (http://code.google.com/apis/maps/documentation/staticmaps/). [JG: Work started.]
+
+			FUNCTIONALITY:
+			[*] look at replacing the buttons with custom map controls by subclassing GControl. [JG: Done. Not viable for our needs.]
+			[ ] shift the "close map" button off to an options page: [JG: Work started.]
+				// Set up map toggle as a keyboard accessible element
+				$('#map-enabled')
+					.before('<div id="map-toggle"><a href="javascript:;"><img src="images/close-map.gif" alt="Close the map" /></a></div>');
+				$('#map-toggle a')
+					.click(function(){
+						$('#map-enabled').slideToggle('slow',function(){
+							if ($(this).css('display')=='none') {
+								$('#map-toggle img')
+									.attr('src','images/close-map.gif')	// NB: change to open-map.gif
+									.attr('alt','Open the map');
+							}else{
+								$('#map-toggle img')
+									.attr('src','images/close-map.gif')
+									.attr('alt','Close the map');
+								map.checkResize();
+							}
+						});
+					});
+			[*] remove functionality prototyped with jQuery. May decide to reintroduce it later for effects.

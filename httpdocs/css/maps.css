@@ -44,7 +44,7 @@ table {
 /* reset end */
 
 html {
-	font-size: 100.1%;
+	font-size: 100.01%;
 }
 
 body {
@@ -132,27 +132,14 @@ p {
 	padding-top: 0.25em;
 }
 
-#map-enabled #map { /* NB: Only position the map if it is enabled. */
-	height: 52em;
+#map-enabled #map { /* NB: Only position the map if it is enabled. Default the size in case a class is not applied. */
 	position: absolute;
 	left: 240px;
 	padding-top: 0;
 }
 
-#map-resize {
+#resize-controls {
 	margin-bottom: 10px;
-}
-
-#map.small {
-	width: 600px;
-}
-
-#map.medium {
-	width: 800px;
-}
-
-#map.large {
-	width: 1150px
 }
 
 #directions {
